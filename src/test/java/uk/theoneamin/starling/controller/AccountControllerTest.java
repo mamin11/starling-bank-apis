@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +20,7 @@ import uk.theoneamin.starling.exception.GlobalExceptionHandler;
 import uk.theoneamin.starling.model.requests.accounts.AccountResponse;
 import uk.theoneamin.starling.model.requests.accounts.MainAccountsResponse;
 import uk.theoneamin.starling.service.AccountService;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @ExtendWith(MockitoExtension.class)
 class AccountControllerTest {
@@ -39,12 +32,10 @@ class AccountControllerTest {
     private AccountService accountService;
 
     private MockMvc mvc;
-    private JacksonTester<MainAccountsResponse> mainAccountsResponseJacksonTester;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     public void setup() {
-        JacksonTester.initFields(this, new ObjectMapper());
-
         mvc = MockMvcBuilders.standaloneSetup(accountController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
@@ -76,9 +67,7 @@ class AccountControllerTest {
 
         // then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.getContentAsString()).isEqualTo(
-                mainAccountsResponseJacksonTester.write(mainAccountsResponse).getJson()
-        );
+        assertThat(response.getContentAsString()).isEqualTo(objectMapper.writeValueAsString(mainAccountsResponse));
     }
 
     @Test
@@ -107,9 +96,7 @@ class AccountControllerTest {
 
         // then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.getContentAsString()).isEqualTo(
-                mainAccountsResponseJacksonTester.write(mainAccountsResponse).getJson()
-        );
+        assertThat(response.getContentAsString()).isEqualTo(objectMapper.writeValueAsString(mainAccountsResponse));
     }
 
     @Test
